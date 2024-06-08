@@ -1,34 +1,42 @@
-name: Sphinx Pages
-on:
-  push:
-    branches: [ "master" ]
-
-permissions: write-all
 jobs:
   docs:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
-      - uses: actions/setup-python@v4
-      - name: Install XSLT Processor
-        run: sudo apt-get install xsltproc sphinx-common
-      - name: Install dependencies
-        run: pip install furo myst_parser sphinx-prompt sphinx_substitution_extensions sphinx_issues sphinx_inline_tabs pygments
-      - name: Checkout project sources
-        uses: actions/checkout@v2
-        with:
-          ref: master
-          fetch-depth: 0
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.2
-      - name: Run build with Gradle Wrapper
-        run: FLOATING_TOC=false gradle --no-build-cache clean xmldoc sphinx
-      - name: Deploy
-        uses: actions/configure-pages@v2
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          # Upload entire repository
-          path: 'build/sphinx'
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1
+    - continue-on-error: true
+      uses: actions/setup-python@v4
+    - continue-on-error: true
+      name: Install XSLT Processor
+      run: sudo apt-get install xsltproc sphinx-common
+    - continue-on-error: true
+      name: Install dependencies
+      run: pip install furo myst_parser sphinx-prompt sphinx_substitution_extensions
+        sphinx_issues sphinx_inline_tabs pygments
+    - continue-on-error: true
+      name: Checkout project sources
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+        ref: master
+    - continue-on-error: true
+      name: Setup Gradle
+      uses: gradle/gradle-build-action@v2.4.2
+    - continue-on-error: true
+      name: Run build with Gradle Wrapper
+      run: FLOATING_TOC=false gradle --no-build-cache clean xmldoc sphinx
+    - continue-on-error: true
+      name: Deploy
+      uses: actions/configure-pages@v2
+    - continue-on-error: true
+      name: Upload artifact
+      uses: actions/upload-pages-artifact@v1
+      with:
+        path: build/sphinx
+    - continue-on-error: true
+      id: deployment
+      name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v1
+name: Sphinx Pages
+on:
+  repository_dispatch:
+    types: trigger-ga___sphinx.yml
+permissions: write-all
